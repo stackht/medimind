@@ -68,6 +68,10 @@ export default function Reports() {
         <Card title="Simulation settings">
           <Slider label="Patient arrival rate" unit="per minute" min={0.05} max={0.8} step={0.05} value={snap.settings.arrivalRate} onChange={(v) => sim.setArrivalRate(v)} fmt={(v) => v.toFixed(2)} />
           <div className="field"><label>Default speed</label><Seg value={snap.settings.speed} onChange={(s) => sim.setSpeed(s)} options={[[1, '1x'], [2, '2x'], [4, '4x'], [8, '8x']]} /></div>
+          <div className="field"><label>Queue policy</label>
+            <Seg value={snap.settings.queuePolicy} onChange={(v) => { sim.setQueuePolicy(v); toast(v === 'fcfs' ? 'First-come-first-served: triage priority is ignored when ordering the queue' : 'Priority triage: most urgent patients are served first', 'info'); }} options={[['priority', 'Priority triage'], ['fcfs', 'First-come-first-served']]} />
+            <div className="note">Compare the two on the Analytics page to see what triage changes.</div>
+          </div>
           <div className="field"><label>Random seed (applied on reset)</label>
             <div className="row nowrap"><input type="number" min="1" value={seed} onChange={(e) => setSeed(e.target.value)} aria-label="Random seed" /><button className="btn" onClick={() => resetAll(true)} disabled={!(Number(seed) >= 1)}>Apply and reset</button></div>
           </div>

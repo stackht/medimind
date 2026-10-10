@@ -2,7 +2,7 @@
 // It calls the project's real algorithms: Prolog triage + allocation, fuzzy monitoring,
 // neuro-fuzzy risk, and A* routing. All patients are synthetic.
 import { mulberry32, getTrainedModel, scoreRisk, riskCategory } from './anfis.js';
-import { classifyPatient, allocateAll } from './prolog.js';
+import { classifyPatient, allocateAll, allocateSequential } from './prolog.js';
 import { infer, VITALS_SYSTEM } from './fuzzy.js';
 import { buildAdjacency, EDGES, NODE_BY_ID, edgeKey } from './graph.js';
 import { astar } from './search.js';
@@ -32,7 +32,7 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 export class Simulation {
   constructor() {
     this.listeners = new Set();
-    this.settings = { arrivalRate: 0.35, seed: 42, speed: 1 };
+    this.settings = { arrivalRate: 0.35, seed: 42, speed: 1, queuePolicy: 'priority' };
     this.timer = null;
     this.busy = false;
     this.gen = 0;
@@ -46,6 +46,7 @@ export class Simulation {
   init() {
     this.gen++;
     this.rnd = mulberry32(this.settings.seed);
+    this.driftRnd = mulberry32(this.settings.seed + 7919); // vitals drift uses its own stream so arrivals never depend on care decisions
     this.state = {
       ready: false, running: false, tick: 0, nextId: 1001, eventId: 1, alertId: 1,
       patients: [], resources: freshResources(), alerts: [], events: [], history: [],
@@ -105,6 +106,7 @@ export class Simulation {
     this.emit();
   }
   setArrivalRate(arrivalRate) { this.settings = { ...this.settings, arrivalRate }; this.emit(); }
+  setQueuePolicy(queuePolicy) { this.settings = { ...this.settings, queuePolicy }; this.log('system', `Queue policy set to ${queuePolicy === 'fcfs' ? 'first-come-first-served' : 'priority triage'}.`, { algo: 'Operator setting' }); this.emit(); }
   setSeed(seed) { this.settings = { ...this.settings, seed: Math.max(1, Math.floor(seed) || 1) }; this.emit(); }
 
   // ---------- logging ----------
@@ -302,10 +304,12 @@ export class Simulation {
   async allocate(gen) {
     const s = this.state;
     const res = s.resources;
+    const fcfs = this.settings.queuePolicy === 'fcfs';
     const waiting = s.patients.filter((p) => p.status === 'waiting')
-      .sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority] || a.arrivalTick - b.arrivalTick).slice(0, 6);
+      .sort((a, b) => (fcfs ? 0 : PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]) || a.arrivalTick - b.arrivalTick).slice(0, 6);
     if (!waiting.length || !res.beds.some((b) => b.free) || !res.doctors.some((d) => d.free)) return;
-    const results = await allocateAll(res, waiting.map((p) => ({ id: p.id, name: p.id, priority: PROLOG_LEVEL[p.priority], condition: p.condition, diag: p.diag })));
+    const needs = waiting.map((p) => ({ id: p.id, name: p.id, priority: PROLOG_LEVEL[p.priority], condition: p.condition, diag: p.diag }));
+    const results = fcfs ? await allocateSequential(res, needs) : await allocateAll(res, needs);
     if (gen !== this.gen) return;
     for (const r of results) {
       if (r.bed === 'none' || r.doctor === 'none') continue;
@@ -328,7 +332,7 @@ export class Simulation {
       const stepped = bed.type !== wanted;
       const why = stepped
         ? `${resName(wanted)} beds were full, so the fallback rule stepped to ${resName(bed.type)}.`
-        : `${PRIORITY_LABEL[p.priority]} priority needs a ${resName(bed.type)} bed; ${resName(doc.specialty)} doctor matched the condition.`;
+        : `${PRIORITY_LABEL[p.priority]} priority needs ${/^[aeiou]/i.test(resName(bed.type)) ? 'an' : 'a'} ${resName(bed.type)} bed; ${resName(doc.specialty)} doctor matched the condition.`;
       s.decisions.alloc = { t: s.tick, patientId: p.id, algo: 'Prolog allocation rules', text: `${p.id} assigned ${resName(bed.id)} and ${resName(doc.id)}`, why };
       this.log('patient', `${p.id} admitted to ${resName(bed.id)} with ${resName(doc.id)}${dx ? ` and ${resName(dx.id)}` : p.diag !== 'none' ? ' (diagnostics queued)' : ''}.`,
         { patientId: p.id, algo: 'Prolog allocation rules', why });
@@ -350,11 +354,11 @@ export class Simulation {
       for (const p of s.patients) {
         if (p.status !== 'waiting' && p.status !== 'treating') continue;
         if (p.status === 'treating') {
-          p.heartRate += Math.sign(78 - p.heartRate) * (this.rnd() < 0.4 ? 1 : 0);
-          p.temp = Math.round((p.temp + Math.sign(37 - p.temp) * (this.rnd() < 0.3 ? 0.1 : 0)) * 10) / 10;
+          p.heartRate += Math.sign(78 - p.heartRate) * (this.driftRnd() < 0.4 ? 1 : 0);
+          p.temp = Math.round((p.temp + Math.sign(37 - p.temp) * (this.driftRnd() < 0.3 ? 0.1 : 0)) * 10) / 10;
         } else {
-          p.heartRate = clamp(p.heartRate + Math.round((this.rnd() - 0.5) * 4), 40, 190);
-          p.temp = clamp(Math.round((p.temp + (this.rnd() - 0.5) * 0.12) * 10) / 10, 35, 41.5);
+          p.heartRate = clamp(p.heartRate + Math.round((this.driftRnd() - 0.5) * 4), 40, 190);
+          p.temp = clamp(Math.round((p.temp + (this.driftRnd() - 0.5) * 0.12) * 10) / 10, 35, 41.5);
         }
         p.vitals = monitor(p);
       }

@@ -102,8 +102,8 @@ export async function classifyPatient(patient) {
 export const RESOURCE_RULES = `% ---- allocation rules ----
 % bed type needed by priority
 bed_needed(high, icu).    bed_needed(medium, ward).   bed_needed(low, day_care).
-% if the preferred bed type is full, try a step-up type
-fallback_bed(icu, hdu).   fallback_bed(hdu, ward).    fallback_bed(ward, day_care).
+% if the preferred bed type is full, try the neighbouring bed type
+fallback_bed(icu, hdu).   fallback_bed(hdu, ward).    fallback_bed(ward, day_care).   fallback_bed(day_care, ward).
 
 % specialist needed by condition
 specialty(cardiac, cardiology).     specialty(respiratory, pulmonology).
@@ -136,16 +136,15 @@ export async function allocateOne(resources, patient) {
   return { bed: r.B, doctor: r.D, diag: r.X };
 }
 
-export async function allocateAll(resources, patients) {
-  const rank = { high: 0, medium: 1, low: 2 };
-  const order = [...patients].sort((a, b) => rank[a.priority] - rank[b.priority]);
+// Allocates in the order given (no re-sorting). Each assigned resource is removed from the pool for the next patient.
+export async function allocateSequential(resources, ordered) {
   const state = {
     beds: resources.beds.map((b) => ({ ...b })),
     doctors: resources.doctors.map((d) => ({ ...d })),
     diags: resources.diags.map((d) => ({ ...d })),
   };
   const results = [];
-  for (const p of order) {
+  for (const p of ordered) {
     const a = await allocateOne(state, p);
     const bed = state.beds.find((b) => b.id === a.bed); if (bed) bed.free = false;
     const doc = state.doctors.find((d) => d.id === a.doctor); if (doc) doc.free = false;
@@ -153,4 +152,10 @@ export async function allocateAll(resources, patients) {
     results.push({ patient: p, ...a });
   }
   return results;
+}
+
+// Most urgent first (high, then medium, then low).
+export async function allocateAll(resources, patients) {
+  const rank = { high: 0, medium: 1, low: 2 };
+  return allocateSequential(resources, [...patients].sort((a, b) => rank[a.priority] - rank[b.priority]));
 }

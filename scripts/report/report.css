@@ -1,0 +1,73 @@
+@page { size: 8.5in 11in; margin: 0.8in 0.85in 1.0in 0.85in; }
+* { box-sizing: border-box; }
+html { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: #000; }
+body { margin: 0; }
+p { margin: 0 0 10pt; line-height: 20.7pt; text-align: justify; }
+.page { break-after: page; position: relative; }
+.chapter { break-before: page; }
+.center { text-align: center; }
+b, strong { font-weight: 700; }
+code, .mono { font-family: Consolas, 'Courier New', monospace; font-size: 10.5pt; }
+
+/* ---- cover ---- */
+.cover { text-align: center; padding-top: 0.0in; }
+.cover p { text-align: center; line-height: 1.25; margin: 0; }
+.cover .gap { height: 17pt; }
+.cover img.logo { width: 86pt; height: auto; margin: 10pt 0 2pt; }
+/* ---- certificate / approval ---- */
+.hdr { text-align: center; }
+.hdr img { width: 48pt; display: block; margin: 0 auto 8pt; }
+.hdr p { text-align: center; line-height: 1.3; margin: 0; }
+.hdr .big { font-size: 28pt; margin: 22pt 0 16pt; line-height: 1.1; }
+.cert-p { margin: 0 0.35in 12pt; }
+.sigrow { display: flex; justify-content: space-between; margin: 28pt 0.4in 0; }
+.sigrow p { text-align: left; margin: 0; }
+table.names { margin: 18pt auto 14pt; border-collapse: collapse; }
+table.names td, table.names th { padding: 4pt 40pt 4pt 40pt; text-align: left; font-size: 12pt; }
+.examiners { margin: 26pt 0 0 4.1in; }
+.examiners p { text-align: left; line-height: 24pt; margin: 0; }
+.line { display: inline-block; border-bottom: 1px solid #000; width: 1.15in; margin-left: 4pt; height: 12pt; }
+.lineL { display: inline-block; border-bottom: 1px solid #000; width: 1.9in; height: 11pt; margin-left: 4pt; }
+.title16 { font-size: 16pt; font-weight: 700; text-align: center; margin: 0 0 14pt; }
+
+/* ---- contents ---- */
+.toc { margin-top: 20pt; }
+.toc .row { display: flex; align-items: baseline; font-size: 12pt; line-height: 17pt; margin: 0 0 11pt; }
+.toc .row .n { flex: none; font-weight: 700; }
+.toc .row .t { flex: none; }
+.toc .row .d { flex: 1; border-bottom: 1.2px dotted #000; margin: 0 5pt; transform: translateY(-3pt); }
+.toc .row .p { flex: none; min-width: 20pt; text-align: right; }
+.toc .l0 .n { width: 0; } .toc .l1 { padding-left: 0; } .toc .l1 .n { width: 26pt; }
+.toc .l2 { padding-left: 26pt; } .toc .l2 .n { width: 36pt; }
+.toc .l3 { padding-left: 62pt; } .toc .l3 .n { width: 44pt; font-weight: 400; }
+.toc .l2 .n, .toc .l3 .n { font-weight: 700; }
+.toc .l3 .n { font-weight: 400; }
+
+/* ---- lists ---- */
+.lof .row { display: flex; font-size: 12pt; margin: 0 0 10pt; line-height: 14pt; }
+.lof .row .a { flex: none; width: 65pt; } .lof .row .b { flex: 1; padding-right: 24pt; } .lof .row .c { flex: none; width: 24pt; text-align: right; }
+
+/* ---- chapters ---- */
+h1.chap { text-align: center; font-size: 16pt; font-weight: 700; margin: 24pt 0 0; line-height: 1.3; }
+h1.chap + h1.chap { margin-top: 14pt; margin-bottom: 26pt; }
+h2.sec { font-size: 12pt; font-weight: 700; margin: 16pt 0 6pt; line-height: 1.4; break-after: avoid; }
+h3.sub { font-size: 12pt; font-weight: 700; margin: 12pt 0 6pt; line-height: 1.4; break-after: avoid; }
+figure { margin: 10pt 0 12pt; text-align: center; break-inside: avoid; }
+figure img { max-width: 100%; height: auto; }
+figure.shot img { border: 1px solid #c9ced6; }
+figcaption, .cap { text-align: center; font-size: 12pt; margin-top: 6pt; line-height: 1.3; }
+.subcap { font-weight: 700; text-align: left; margin: 8pt 0 3pt; font-size: 11pt; }
+table.t { border-collapse: collapse; width: 100%; margin: 8pt 0 4pt; font-size: 10.5pt; break-inside: avoid; }
+table.t th, table.t td { border: 1px solid #b9bec7; padding: 4pt 6pt; vertical-align: top; text-align: left; line-height: 1.3; }
+table.t th { font-weight: 700; background: #fff; }
+table.t td.c, table.t th.c { text-align: center; }
+ul.b { margin: 4pt 0 10pt 0; padding-left: 26pt; } ul.b li { margin: 0 0 8pt; line-height: 20.7pt; text-align: justify; }
+ol.n { margin: 4pt 0 10pt 0; padding-left: 28pt; } ol.n li { margin: 0 0 8pt; line-height: 20.7pt; text-align: justify; }
+.steps p { margin: 0 0 8pt; padding-left: 0; }
+.eq { display: flex; align-items: center; justify-content: space-between; margin: 8pt 0.3in 12pt 0.5in; font-style: italic; }
+.eq .no { font-style: normal; }
+.eq sub, .eq sup { font-size: 70%; }
+.refs p { text-align: left; margin: 0 0 8pt; line-height: 15.5pt; font-size: 11.5pt; }
+.ack p { line-height: 20.7pt; }
+.small { font-size: 10pt; }
+.nobreak { break-inside: avoid; }

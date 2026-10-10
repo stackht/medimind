@@ -28,7 +28,7 @@ export default function Emergency() {
   const toggleEdge = (e) => {
     if (e.type !== 'corridor') return;
     const n = new Set(blocked);
-    n.has(e.key) ? n.delete(e.key) : n.add(e.key);
+    if (n.has(e.key)) n.delete(e.key); else n.add(e.key);
     setBlocked(n); player.reset();
   };
   const reset = () => player.reset();

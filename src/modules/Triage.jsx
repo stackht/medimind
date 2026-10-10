@@ -75,7 +75,7 @@ export default function Triage() {
             </div>
             {answers && (
               <div className="code" style={{ marginTop: 10, maxHeight: 160 }}>
-                {answers.length === 0 ? 'false.' : answers.map((a, i) => (Object.keys(a).length ? Object.entries(a).map(([k, v]) => `${k} = ${v}`).join(', ') + ' ;' : 'true.')).join('\n')}
+                {answers.length === 0 ? 'false.' : answers.map((a) => (Object.keys(a).length ? Object.entries(a).map(([k, v]) => `${k} = ${v}`).join(', ') + ' ;' : 'true.')).join('\n')}
               </div>
             )}
           </Card>

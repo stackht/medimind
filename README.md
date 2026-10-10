@@ -1,25 +1,34 @@
-# MediMind – AI-Powered Smart Hospital Assistant
+# MediMind: Smart Hospital Assistant
+
+An educational, frontend-only hospital operations dashboard. One shared, seeded simulation of synthetic patients
+drives every page, and each decision is made by an algorithm implemented in this project.
 
 **Problem statement.** Hospitals must coordinate many decisions at once: who is seen first, how patients are
-monitored and risk-scored, which beds, doctors and scanners they get, how they and emergency transfers move
-through the building, how rooms are controlled, how digital systems are defended, what the records reveal, and
-how patients are kept informed. MediMind is one integrated AI assistant that handles all of this for a simulated
-patient, with every capability backed by a different classical AI technique.
+monitored and risk-scored, which beds, doctors and scanners they get, how emergency transfers move through the
+building, how rooms are controlled, how digital systems are defended, what the records reveal, and how patients are
+kept informed. MediMind is one integrated assistant for all of this. The ten AI techniques are its features and are
+also available as stand-alone experiments.
 
-A frontend-only React demo. All data is synthetic; there is no backend.
+## Dashboard (live simulation)
 
-| Feature | Technique |
-|---------|-----------|
-| Patient navigation | BFS, DFS, state-space search |
-| Priority triage | Prolog facts and rules (Tau Prolog) |
-| Resource allocation | Prolog knowledge base and allocation rules |
-| Emergency routing | A* with an admissible heuristic, blocked corridors |
-| Security operations | Minimax game tree with alpha-beta pruning |
-| Vitals monitoring | Mamdani fuzzy inference |
-| Room environment | Fuzzy control (27 rules) |
-| Risk estimation | Neuro-fuzzy network (ANFIS, back-propagation) |
-| Patient insights | Perceptron and competitive learning |
-| Health messaging | Bigram and trigram language models |
+| Page | What it does | Algorithm |
+|------|--------------|-----------|
+| Overview | KPIs, queue, workload, bed occupancy, AI decision summary, alerts | all of the below |
+| Patient Management | Searchable, sortable, filterable patient table with detail drawer | Prolog triage results |
+| Patient Triage | Suggested priority, factors, Prolog console, walk-in triage form | Prolog rules |
+| Hospital Resources | Beds, doctors, diagnostics; adjust capacity; allocation log | Prolog allocation rules |
+| Emergency Routing | Route map, closable corridors, cost and nodes expanded | A* search |
+| Patient Monitoring | Live vitals per patient, department room lighting | Fuzzy inference, fuzzy control, neuro-fuzzy risk |
+| Traffic & Queue Analytics | Department, priority, waiting-time and utilization charts | simulation state |
+| Reports & Settings | CSV/JSON export, arrival rate, seed, reduce motion | n/a |
+
+Simulation controls: start, pause, reset, speed (1x to 8x), add patient, trigger emergency, adjust resources.
+
+## AI Experiments
+
+The ten problem statements, each a self-contained experiment that can load a patient from the live simulation:
+navigation (BFS/DFS), Prolog triage, Prolog resource management, A* routing, Minimax security, fuzzy monitoring,
+fuzzy room control, neuro-fuzzy risk, perceptron and competitive learning, bigram/trigram text generation.
 
 ## Run
 
@@ -33,7 +42,8 @@ npm run preview  # serve the build
 ## Layout
 
 - `src/lib/` – all algorithms, written from scratch (`graph`, `search`, `prolog`, `fuzzy`, `anfis`, `learn`, `minimax`, `ngram`)
-- `src/modules/` – one page per problem statement, plus the journey dashboard
+- `src/lib/sim.js` – the shared simulation engine; `src/lib/simData.js` – synthetic patient generator
+- `src/pages/` – dashboard pages; `src/modules/` – the ten experiments (and the end-to-end journey)
 - `src/components/` – shared UI, SVG hospital map and charts
 - `src/lib/tauShim.js` – lets tau-prolog load under ES-module strict mode
 

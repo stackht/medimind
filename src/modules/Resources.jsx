@@ -12,10 +12,10 @@ const sel = (value, onChange, options) => (
   </select>
 );
 
-export default function Resources() {
+export default function Resources({ fromSim = null }) {
   const { patient } = usePatient();
-  const [res, setRes] = useState(DEFAULT_RESOURCES);
-  const [queue, setQueue] = useState([
+  const [res, setRes] = useState(fromSim?.resources ?? DEFAULT_RESOURCES);
+  const [queue, setQueue] = useState(fromSim?.queue ?? [
     { id: 1, name: 'Walk-in A', priority: 'low', condition: 'general', diag: 'none' },
     { id: 2, name: 'Ambulance case', priority: 'high', condition: 'trauma', diag: 'ct' },
     { id: 3, name: 'Referral', priority: 'medium', condition: 'respiratory', diag: 'xray' },

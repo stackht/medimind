@@ -3,7 +3,7 @@ import { mulberry32 } from './anfis.js';
 const gauss = (rnd) => Math.sqrt(-2 * Math.log(rnd() + 1e-9)) * Math.cos(2 * Math.PI * rnd());
 const clamp = (v) => Math.min(10, Math.max(0, v));
 
-// ---------- PS9a: Perceptron (supervised) ----------
+// ---------- Perceptron (supervised) ----------
 // Two synthetic patient classes on two indices (0-10): vital instability, lab abnormality.
 export function genPerceptronData(n = 70, seed = 3, spread = 1.45) {
   const rnd = mulberry32(seed);
@@ -33,7 +33,7 @@ export function trainPerceptron(data, { eta = 0.05, epochs = 40, seed = 1 } = {}
 }
 export const perceptronPredict = (h, x, y) => (h.w[0] * x + h.w[1] * y + h.b >= 0 ? 1 : 0);
 
-// ---------- PS9b: Competitive learning (unsupervised, winner-takes-all) ----------
+// ---------- Competitive learning (unsupervised, winner-takes-all) ----------
 export function genClusterData(n = 90, seed = 9) {
   const rnd = mulberry32(seed);
   const centers = [[2.2, 7.5], [6.2, 2.5], [8, 8]];

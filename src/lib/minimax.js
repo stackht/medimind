@@ -1,4 +1,4 @@
-// PS5: Minimax game between a Defender (MAX) and an Attacker (MIN) over hospital digital assets.
+// Minimax game between a Defender (MAX) and an Attacker (MIN) over hospital digital assets.
 // Utility is from the defender's point of view and uses predefined values.
 export const DEFAULT_ASSETS = [
   { id: 'ehr', name: 'Patient-Record DB', value: 100 },

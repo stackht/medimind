@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
-export function PageHeader({ ps, title, desc, tags = [] }) {
+export function PageHeader({ title, desc, tags = [] }) {
   return (
     <header className="page-head">
       <h1>{title}</h1>
       <p>{desc}</p>
-      <div className="page-meta">{ps.split('·')[0].trim()} · {tags.join(', ')}</div>
+      <div className="page-meta">Technique: {tags.join(', ')}</div>
     </header>
   );
 }

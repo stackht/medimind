@@ -1,4 +1,4 @@
-// PS10: Bigram (micro LM, 1 previous word) and Trigram (small LM, 2 previous words).
+// Bigram (micro LM, 1 previous word) and Trigram (small LM, 2 previous words).
 export const START = '<s>';
 export const END = '</s>';
 

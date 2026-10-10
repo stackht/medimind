@@ -41,7 +41,7 @@ export function infer(system, inputs, samples = 201) {
   return { fuzzified, fired, curve, crisp, label };
 }
 
-// ---------- PS6: vital-sign monitoring ----------
+// ---------- vital-sign monitoring ----------
 const L = ['low', 'normal', 'elevated', 'veryHigh'];
 const T = ['low', 'normal', 'fever', 'high'];
 const MATRIX = [
@@ -62,7 +62,7 @@ export const VITALS_SYSTEM = {
   rules: L.flatMap((h, i) => T.map((t, j) => ({ if: { heartRate: h, temp: t }, then: MATRIX[i][j] }))),
 };
 
-// ---------- PS7: room lighting control ----------
+// ---------- room lighting control ----------
 const ACT = ['rest', 'care', 'procedure'];
 const AMB = ['dark', 'dim', 'bright'];
 const OCC = ['empty', 'few', 'crowded'];

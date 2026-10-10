@@ -39,7 +39,7 @@ export function solveAll(program, goal, max = 100) {
 }
 
 // ------------------------------------------------------------------
-// PS2: triage knowledge base (rules). Patient facts are appended.
+// triage knowledge base (rules). Patient facts are appended.
 // ------------------------------------------------------------------
 export const SYMPTOMS = {
   severe: ['chest_pain', 'breathing_difficulty', 'unconscious', 'severe_bleeding', 'seizure', 'stroke_signs'],
@@ -97,7 +97,7 @@ export async function classifyPatient(patient) {
 }
 
 // ------------------------------------------------------------------
-// PS3: resource allocation knowledge base.
+// resource allocation knowledge base.
 // ------------------------------------------------------------------
 export const RESOURCE_RULES = `% ---- allocation rules ----
 % bed type needed by priority

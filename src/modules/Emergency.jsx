@@ -35,7 +35,7 @@ export default function Emergency() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 4 · Emergency Patient Route Optimization" title="Emergency Router with A*"
+      <PageHeader title="Emergency Router with A*"
         desc="A* finds the lowest-cost route using f(n) = g(n) + h(n): distance travelled so far plus a straight-line estimate to the goal. Block corridors or apply transport restrictions and the route is re-planned instantly."
         tags={['A* search', 'Heuristic function', 'Graph traversal', 'Constraints']} />
 

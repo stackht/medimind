@@ -12,7 +12,7 @@ export default function Vitals() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 6 · Intelligent Patient Monitoring" title="Vitals Monitor with Fuzzy Logic"
+      <PageHeader title="Vitals Monitor with Fuzzy Logic"
         desc="A heart rate of 101 bpm is not suddenly “abnormal”. Fuzzy membership functions let a measurement belong partly to several categories, and fuzzy rules combine them into a smooth monitoring priority."
         tags={['Fuzzy logic', 'Membership functions', 'Mamdani inference', 'Centroid defuzzification']} />
 

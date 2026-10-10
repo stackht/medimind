@@ -52,7 +52,7 @@ export default function Room() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 7 · Smart Hospital Room Environment Control" title="Smart Room Lighting with Fuzzy Logic"
+      <PageHeader title="Smart Room Lighting with Fuzzy Logic"
         desc="A fuzzy controller sets room lighting from three imprecise inputs: how bright it already is, how many people are present, and how demanding the activity is. The output blends smoothly instead of switching between a few fixed levels."
         tags={['Fuzzy control', 'Membership functions', '27 rules', 'Centroid defuzzification']} />
 

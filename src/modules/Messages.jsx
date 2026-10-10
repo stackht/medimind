@@ -36,7 +36,7 @@ export default function Messages() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 10 · Healthcare Text Prediction & Generation" title="Health Messages with µLM and SLM"
+      <PageHeader title="Health Messages with µLM and SLM"
         desc="A Micro Language Model (bigram, one previous word) and a Small Language Model (trigram, two previous words) are trained on a healthcare corpus. Type a few words to see next-word predictions, then generate a short informational message."
         tags={['Bigram µLM', 'Trigram SLM', 'Next-word prediction', 'Text generation']} />
 

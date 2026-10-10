@@ -86,7 +86,7 @@ export default function Insights() {
   const [tab, setTab] = useState('perceptron');
   return (
     <div className="stack">
-      <PageHeader ps="PS 9 · Patient Category Classification & Healthcare Pattern Discovery" title="Patient Insights: Perceptron and Competitive Learning"
+      <PageHeader title="Patient Insights: Perceptron and Competitive Learning"
         desc="Two views of the same idea. Supervised: a perceptron learns to separate labelled patient categories. Unsupervised: competitive learning discovers groups of similar records with no labels at all."
         tags={['Perceptron learning rule', 'Supervised learning', 'Competitive learning', 'Unsupervised clustering']} />
       <Seg value={tab} onChange={setTab} options={[['perceptron', 'Perceptron (supervised)'], ['competitive', 'Competitive learning (unsupervised)']]} />

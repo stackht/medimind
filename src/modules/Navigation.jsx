@@ -23,7 +23,7 @@ export default function Navigation() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 1 · Patient Navigation using AI Search" title="Patient Navigation with BFS and DFS"
+      <PageHeader title="Patient Navigation with BFS and DFS"
         desc="The hospital is a state space: each location is a state, each corridor, lift or staircase is an action, and the cost is walking distance. Compare how breadth-first and depth-first search explore it."
         tags={['State-space search', 'BFS', 'DFS', 'Graph traversal']} />
 

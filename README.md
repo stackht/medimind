@@ -1,20 +1,25 @@
 # MediMind – AI-Powered Smart Hospital Assistant
 
-A frontend-only React demo that follows one simulated patient through a hospital and solves each
-stage with a different classical AI technique. All data is synthetic; there is no backend.
+**Problem statement.** Hospitals must coordinate many decisions at once: who is seen first, how patients are
+monitored and risk-scored, which beds, doctors and scanners they get, how they and emergency transfers move
+through the building, how rooms are controlled, how digital systems are defended, what the records reveal, and
+how patients are kept informed. MediMind is one integrated AI assistant that handles all of this for a simulated
+patient, with every capability backed by a different classical AI technique.
 
-| PS | Module | Technique |
-|----|--------|-----------|
-| 1  | Patient Navigation  | BFS, DFS, state-space search |
-| 2  | Priority Triage     | Prolog facts + rules (Tau Prolog) |
-| 3  | Resource Manager    | Prolog knowledge base + allocation rules |
-| 4  | Emergency Router    | A* with admissible heuristic, blocked corridors |
-| 5  | Security Ops        | Minimax game tree with alpha-beta pruning |
-| 6  | Vitals Monitor      | Mamdani fuzzy inference |
-| 7  | Smart Room          | Fuzzy control (27 rules) |
-| 8  | Risk Estimator      | Neuro-fuzzy (ANFIS, back-propagation) |
-| 9  | Patient Insights    | Perceptron + competitive learning |
-| 10 | Health Messages     | Bigram µLM and trigram SLM |
+A frontend-only React demo. All data is synthetic; there is no backend.
+
+| Feature | Technique |
+|---------|-----------|
+| Patient navigation | BFS, DFS, state-space search |
+| Priority triage | Prolog facts and rules (Tau Prolog) |
+| Resource allocation | Prolog knowledge base and allocation rules |
+| Emergency routing | A* with an admissible heuristic, blocked corridors |
+| Security operations | Minimax game tree with alpha-beta pruning |
+| Vitals monitoring | Mamdani fuzzy inference |
+| Room environment | Fuzzy control (27 rules) |
+| Risk estimation | Neuro-fuzzy network (ANFIS, back-propagation) |
+| Patient insights | Perceptron and competitive learning |
+| Health messaging | Bigram and trigram language models |
 
 ## Run
 

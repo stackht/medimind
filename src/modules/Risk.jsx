@@ -50,7 +50,7 @@ export default function Risk() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 8 · Hybrid Neuro-Fuzzy Patient Risk Estimation" title="Risk Estimator: Neural Learning meets Fuzzy Reasoning"
+      <PageHeader title="Risk Estimator: Neural Learning meets Fuzzy Reasoning"
         desc="A five-layer ANFIS network: fuzzy membership functions and linear if-then rules form the structure, and gradient-descent back-propagation (neural learning) tunes them from a synthetic, de-identified dataset."
         tags={['Artificial neural network', 'Fuzzy inference (Takagi–Sugeno)', 'Hybrid neuro-fuzzy', 'Back-propagation']} />
 

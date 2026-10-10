@@ -32,7 +32,7 @@ export default function Security() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 5 · Healthcare Resource Security" title="Security Operations with Minimax"
+      <PageHeader title="Security Operations with Minimax"
         desc="A defender with limited hardening resources protects hospital servers against a hypothetical attacker. Both play optimally: the defender maximises its utility, the attacker minimises it. Minimax searches the game tree to find the best defensive strategy."
         tags={['Minimax', 'Game tree', 'Utility evaluation', 'Alpha-beta pruning']} />
 

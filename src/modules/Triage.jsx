@@ -26,7 +26,7 @@ export default function Triage() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 2 · Patient Priority Classification" title="Priority Triage with Prolog"
+      <PageHeader title="Priority Triage with Prolog"
         desc="Reported symptoms become Prolog facts. A rule base reasons over them to classify the case as low, medium or high priority and recommend an assessment priority, and it can explain which rules fired."
         tags={['Prolog (Tau Prolog)', 'Facts', 'Rules', 'Logical reasoning']} />
 

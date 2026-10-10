@@ -1,4 +1,4 @@
-// PS8: hybrid neuro-fuzzy model = ANFIS-style Takagi-Sugeno network.
+// hybrid neuro-fuzzy model = ANFIS-style Takagi-Sugeno network.
 // Layer 1 fuzzification (Gaussian MFs, trainable)  -> Layer 2 rule firing (product)
 // Layer 3 normalisation -> Layer 4 linear consequents (trainable) -> Layer 5 weighted sum.
 // Trained by back-propagating the squared error through all five layers.

@@ -44,7 +44,7 @@ export default function Resources() {
 
   return (
     <div className="stack">
-      <PageHeader ps="PS 3 · Smart Hospital Resource Management" title="Resource Manager with Prolog"
+      <PageHeader title="Resource Manager with Prolog"
         desc="Beds, doctors and diagnostic units are Prolog facts. Allocation rules match each simulated patient’s needs to what is currently free, with fallback rules (for example a step-down bed when the ICU is full). Patients are served most urgent first."
         tags={['Prolog', 'Knowledge representation', 'Rule-based reasoning', 'Allocation rules']} />
 

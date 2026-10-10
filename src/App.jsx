@@ -15,16 +15,16 @@ import Insights from './modules/Insights.jsx';
 import Messages from './modules/Messages.jsx';
 
 export const MODULES = [
-  { group: 'Care pathway', path: '/triage', ps: 'PS 2', name: 'Priority Triage', el: <Triage /> },
-  { group: 'Care pathway', path: '/vitals', ps: 'PS 6', name: 'Vitals Monitor', el: <Vitals /> },
-  { group: 'Care pathway', path: '/risk', ps: 'PS 8', name: 'Risk Estimator', el: <Risk /> },
-  { group: 'Care pathway', path: '/resources', ps: 'PS 3', name: 'Resource Manager', el: <Resources /> },
-  { group: 'Movement', path: '/navigate', ps: 'PS 1', name: 'Patient Navigation', el: <Navigation /> },
-  { group: 'Movement', path: '/emergency', ps: 'PS 4', name: 'Emergency Router', el: <Emergency /> },
-  { group: 'Facility', path: '/room', ps: 'PS 7', name: 'Smart Room', el: <Room /> },
-  { group: 'Facility', path: '/security', ps: 'PS 5', name: 'Security Ops', el: <Security /> },
-  { group: 'Data & language', path: '/insights', ps: 'PS 9', name: 'Patient Insights', el: <Insights /> },
-  { group: 'Data & language', path: '/messages', ps: 'PS 10', name: 'Health Messages', el: <Messages /> },
+  { group: 'Patient flow', path: '/triage', name: 'Priority Triage', el: <Triage /> },
+  { group: 'Patient flow', path: '/vitals', name: 'Vitals Monitor', el: <Vitals /> },
+  { group: 'Patient flow', path: '/risk', name: 'Risk Estimator', el: <Risk /> },
+  { group: 'Patient flow', path: '/resources', name: 'Resource Manager', el: <Resources /> },
+  { group: 'Navigation', path: '/navigate', name: 'Patient Navigation', el: <Navigation /> },
+  { group: 'Navigation', path: '/emergency', name: 'Emergency Router', el: <Emergency /> },
+  { group: 'Hospital operations', path: '/room', name: 'Smart Room', el: <Room /> },
+  { group: 'Hospital operations', path: '/security', name: 'Security Ops', el: <Security /> },
+  { group: 'Insight & messaging', path: '/insights', name: 'Patient Insights', el: <Insights /> },
+  { group: 'Insight & messaging', path: '/messages', name: 'Health Messages', el: <Messages /> },
 ];
 
 const Logo = () => (
@@ -45,12 +45,12 @@ export default function App() {
           <div className="brand-mark"><Logo /></div>
           <div><div className="brand-name">MediMind</div><div className="brand-sub">Smart Hospital Assistant</div></div>
         </div>
-        <NavLink to="/" end className="nav-link">Overview &amp; journey</NavLink>
+        <NavLink to="/" end className="nav-link">Overview</NavLink>
         {groups.map((g) => (
           <div key={g}>
             <div className="nav-group">{g}</div>
             {MODULES.filter((m) => m.group === g).map((m) => (
-              <NavLink key={m.path} to={m.path} className="nav-link">{m.name}<span className="nav-ps">{m.ps}</span></NavLink>
+              <NavLink key={m.path} to={m.path} className="nav-link">{m.name}</NavLink>
             ))}
           </div>
         ))}

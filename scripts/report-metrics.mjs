@@ -3,7 +3,8 @@ import { writeFileSync } from 'node:fs';
 import { buildAdjacency, NODE_BY_ID } from '../src/lib/graph.js';
 import { bfs, dfs, astar } from '../src/lib/search.js';
 import { classifyPatient } from '../src/lib/prolog.js';
-import { infer, VITALS_SYSTEM, ROOM_SYSTEM } from '../src/lib/fuzzy.js';
+import { infer, inferSugeno, VITALS_SYSTEM, ROOM_SYSTEM } from '../src/lib/fuzzy.js';
+import { performanceMeasures, TARGET_MIN } from '../src/lib/peas.js';
 import { Anfis, genRiskData, splitData, mulberry32, riskCategory } from '../src/lib/anfis.js';
 import { solve, naiveValue, DEFAULT_ASSETS, DEFAULT_PARAMS } from '../src/lib/minimax.js';
 import { genPerceptronData, trainPerceptron, genClusterData, trainCompetitive, purity } from '../src/lib/learn.js';
@@ -64,6 +65,24 @@ out.fuzzyVitals = [[72, 36.8], [100, 37.6], [128, 37.1], [130, 39.0], [150, 40.0
 out.fuzzyRoom = [[15, 1, 1], [420, 4, 5], [850, 3, 2], [30, 5, 9], [200, 0, 0]].map(([a, o, c]) => {
   const r = infer(ROOM_SYSTEM, { ambient: a, occupancy: o, activity: c }); return { ambient: a, occupancy: o, activity: c, intensity: +r.crisp.toFixed(1), label: r.label };
 });
+
+
+// ---- 3b. Mamdani versus Sugeno room-lighting FIS ----
+{
+  const grid = [];
+  for (let a = 0; a <= 1000; a += 50) for (let o = 0; o <= 6; o += 0.5) for (let c = 0; c <= 10; c += 0.5) grid.push({ ambient: a, occupancy: o, activity: c });
+  const t0 = performance.now(); const M = grid.map((g) => infer(ROOM_SYSTEM, g, 101).crisp); const t1 = performance.now();
+  const S = grid.map((g) => inferSugeno(ROOM_SYSTEM, g).crisp); const t2 = performance.now();
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+  const d = M.map((m, i) => Math.abs(m - S[i]));
+  const mm = mean(M), ms = mean(S);
+  const corr = M.reduce((s2, m, i) => s2 + (m - mm) * (S[i] - ms), 0) / Math.sqrt(M.reduce((s2, m) => s2 + (m - mm) ** 2, 0) * S.reduce((s2, x) => s2 + (x - ms) ** 2, 0));
+  const presets = [['Night rest', 15, 1, 1], ['Morning rounds', 420, 4, 5], ['Bright afternoon visit', 850, 3, 2], ['Procedure at night', 30, 5, 9], ['Empty room', 200, 0, 0]].map(([name, a, o, c]) => {
+    const i = { ambient: a, occupancy: o, activity: c }; return { name, mamdani: +infer(ROOM_SYSTEM, i).crisp.toFixed(1), sugeno: +inferSugeno(ROOM_SYSTEM, i).crisp.toFixed(1) };
+  });
+  out.fis = { points: grid.length, meanDiff: mean(d), maxDiff: Math.max(...d), corr, within5: d.filter((x) => x <= 5).length / d.length, mamdaniMs: t1 - t0, sugenoMs: t2 - t1, presets,
+    sugenoRange: [Math.min(...S), Math.max(...S)], mamdaniRange: [Math.min(...M), Math.max(...M)] };
+}
 
 // ---- 4. neuro-fuzzy training ----
 {
@@ -145,6 +164,7 @@ const runPolicy = async (policy, ticks = 480) => {
     peakWaiting: Math.max(...hist.map((h) => h.waiting)), alerts: snap.alerts.length, emergencyAlerts: snap.alerts.filter((a) => a.level === 'emergency').length,
     allocations: snap.patients.filter((p) => p.bedId).length,
     triageEvents: snap.patients.filter((p) => p.prolog).length,
+    peas: performanceMeasures(snap),
     arrivalSig: snap.patients.map((p) => `${p.id}@${p.arrivalTick}`).join(',').length,
   };
 };

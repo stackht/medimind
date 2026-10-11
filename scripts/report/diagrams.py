@@ -65,9 +65,9 @@ def fig_pipeline(path):
     s.arrow(250, 330, 310, 330)
     # core
     s.frame(310, 80, 800, 500, 'MEDIMIND AI CORE (shared seeded simulation)', NAVY, '#e6eef8')
-    items = [('1. PRIORITY TRIAGE', 'Prolog facts and rules', BLUE), ('2. VITALS MONITOR', 'Mamdani fuzzy inference', TEAL),
-             ('3. RISK ESTIMATOR', 'Neuro-fuzzy (ANFIS)', BLUE), ('4. RESOURCE ALLOCATION', 'Prolog knowledge base', TEAL),
-             ('5. ROUTING', 'BFS, DFS and A* search', BLUE), ('6. ROOM CONTROL', 'Fuzzy control (27 rules)', TEAL),
+    items = [('1. PEAS FORMULATION', 'Agent, environment, performance', BLUE), ('2. PRIORITY TRIAGE', 'Prolog facts and rules', TEAL),
+             ('3. VITALS AND RISK', 'Fuzzy logic + neuro-fuzzy (ANFIS)', BLUE), ('4. RESOURCE ALLOCATION', 'Prolog rules (supporting)', TEAL),
+             ('5. ROUTING', 'BFS, DFS and A* search', BLUE), ('6. ROOM CONTROL', 'Mamdani and Sugeno FIS', TEAL),
              ('7. SECURITY', 'Minimax game tree', BLUE), ('8. INSIGHT AND MESSAGING', 'Perceptron, competitive, n-gram', TEAL)]
     for i, (t, sub, c) in enumerate(items):
         col, row = i % 2, i // 2
@@ -111,8 +111,8 @@ def fig_taxonomy(path):
     s = Svg(1400, 640)
     s.text(700, 40, 'CLASSIFICATION OF TECHNIQUES IN MEDIMIND', 24, '800', NAVY)
     s.box(520, 80, 360, 80, 'MEDIMIND AI AND\nSOFT COMPUTING CORE', [], fill=NAVY, tsize=18)
-    cols = [('1. SEARCH AND\nGAME THEORY', ['Breadth-first search (BFS)', 'Depth-first search (DFS)', 'A* with admissible heuristic', 'Minimax with alpha-beta'], 60, BLUE),
-            ('2. KNOWLEDGE-BASED\nAND SOFT COMPUTING', ['Prolog facts and rules', 'Mamdani fuzzy inference', 'Fuzzy control (rooms)', 'Neuro-fuzzy (ANFIS)'], 500, TEAL),
+    cols = [('1. FORMULATION, SEARCH\nAND GAME THEORY', ['PEAS and problem formulation', 'BFS and DFS (uninformed)', 'A* with admissible heuristic', 'Minimax with alpha-beta'], 60, BLUE),
+            ('2. KNOWLEDGE-BASED\nAND SOFT COMPUTING', ['Prolog facts and rules', 'Mamdani FIS (monitoring, rooms)', 'Sugeno FIS (rooms)', 'Neuro-fuzzy (ANFIS)'], 500, TEAL),
             ('3. LEARNING AND\nLANGUAGE MODELS', ['Perceptron (supervised)', 'Competitive learning', 'Bigram micro LM', 'Trigram small LM'], 940, GREEN)]
     for t, items, x, c in cols:
         s.arrow(700, 160, x + 200, 235)
@@ -155,7 +155,7 @@ def fig_proposed(path):
     s.arrow(700, 412, 700, 454)
     # ai services
     s.frame(40, 454, 1320, 250, 'AI SERVICES (implemented from scratch in JavaScript)', NAVY, '#e8edf5')
-    ai = [('Prolog engine', ['Tau Prolog:', 'triage and', 'allocation rules']), ('Fuzzy engine', ['Mamdani FIS:', 'vitals and', 'room control']), ('Neuro-fuzzy', ['ANFIS risk', 'model']),
+    ai = [('Prolog engine', ['Tau Prolog:', 'triage and', 'allocation rules']), ('Fuzzy engines', ['Mamdani and', 'Sugeno FIS:', 'vitals, rooms']), ('Neuro-fuzzy', ['ANFIS risk', 'model']),
           ('Graph search', ['BFS, DFS, A*', 'on floor-plan', 'graph']), ('Minimax', ['defender vs', 'attacker', 'game tree']), ('Learning', ['perceptron,', 'competitive,', 'n-gram LMs'])]
     for i, (t, sub) in enumerate(ai):
         s.box(62 + i * 215, 500, 195, 170, t, sub, fill=NAVY, tsize=15, ssize=13)

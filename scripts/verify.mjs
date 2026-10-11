@@ -3,7 +3,8 @@
 import { buildAdjacency, NODES, EDGES, heuristic } from '../src/lib/graph.js';
 import { bfs, dfs, astar } from '../src/lib/search.js';
 import { classifyPatient, allocateOne, allocateAll } from '../src/lib/prolog.js';
-import { infer, VITALS_SYSTEM, ROOM_SYSTEM } from '../src/lib/fuzzy.js';
+import { infer, inferSugeno, VITALS_SYSTEM, ROOM_SYSTEM } from '../src/lib/fuzzy.js';
+import { PEAS, ENV_PROPERTIES, FORMULATION, TARGET_MIN, performanceMeasures } from '../src/lib/peas.js';
 import { Anfis, genRiskData, splitData, mulberry32 } from '../src/lib/anfis.js';
 import { solve, naiveValue, DEFAULT_ASSETS, DEFAULT_PARAMS } from '../src/lib/minimax.js';
 import { genPerceptronData, trainPerceptron, genClusterData, trainCompetitive, purity } from '../src/lib/learn.js';
@@ -156,6 +157,30 @@ await test('TC-42', 'Simulation: priority triage serves emergencies no later tha
     return w.reduce((a, b) => a + b, 0) / Math.max(1, w.length);
   };
   return (await mean('priority')) <= (await mean('fcfs'));
+});
+
+await test('TC-43', 'Sugeno FIS: output stays within its constants (3 to 94) over the whole input grid', () => {
+  for (let a = 0; a <= 1000; a += 100) for (let o = 0; o <= 6; o += 1) for (let c = 0; c <= 10; c += 1) {
+    const y = inferSugeno(ROOM_SYSTEM, { ambient: a, occupancy: o, activity: c }).crisp; if (y < 3 - 1e-9 || y > 94 + 1e-9) return false;
+  }
+  return true;
+});
+await test('TC-44', 'Mamdani and Sugeno FIS agree within 12 points everywhere on the grid', () => {
+  for (let a = 0; a <= 1000; a += 100) for (let o = 0; o <= 6; o += 1) for (let c = 0; c <= 10; c += 1) {
+    const i = { ambient: a, occupancy: o, activity: c };
+    if (Math.abs(infer(ROOM_SYSTEM, i, 101).crisp - inferSugeno(ROOM_SYSTEM, i).crisp) > 12) return false;
+  }
+  return true;
+});
+await test('TC-45', 'Sugeno FIS: empty resting room is dark and crowded procedure is bright', () => inferSugeno(ROOM_SYSTEM, { ambient: 20, occupancy: 0, activity: 0 }).crisp < 10 && inferSugeno(ROOM_SYSTEM, { ambient: 20, occupancy: 5, activity: 9 }).crisp > 85);
+await test('TC-46', 'Sugeno FIS: critical vitals score higher than normal vitals', () => inferSugeno(VITALS_SYSTEM, { heartRate: 150, temp: 40 }).crisp > inferSugeno(VITALS_SYSTEM, { heartRate: 72, temp: 36.8 }).crisp + 40);
+await test('TC-47', 'PEAS description is complete (4 PEAS lists, 7 environment properties, 6 formulation parts)', () =>
+  ['performance', 'environment', 'actuators', 'sensors'].every((k) => PEAS[k].length >= 4) && ENV_PROPERTIES.length === 7 && FORMULATION.length === 6);
+await test('TC-48', 'PEAS performance measures are consistent with the simulation', async () => {
+  const s = await runSim(120); const snap = s.getSnapshot(); const m = performanceMeasures(snap);
+  const counted = snap.patients.filter((p) => p.status !== 'triage' && (p.status === 'waiting' || p.waited != null)).length;
+  return m.patients === counted && m.withinPct >= 0 && m.withinPct <= 100 && m.weightedCost >= 0 && m.explainedPct === 100
+    && Object.keys(TARGET_MIN).every((k) => m.byClass[k].within <= m.byClass[k].n);
 });
 
 const passed = results.filter((r) => r.pass).length;

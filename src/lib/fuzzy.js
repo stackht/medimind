@@ -41,6 +41,23 @@ export function infer(system, inputs, samples = 201) {
   return { fuzzified, fired, curve, crisp, label };
 }
 
+// Takagi-Sugeno (zero-order) inference: every rule outputs a crisp constant z_k and the result is the
+// firing-strength weighted average sum(w_k z_k) / sum(w_k). No output sets and no centroid integral are needed.
+export function inferSugeno(system, inputs) {
+  const fuzzified = {};
+  for (const v of system.inputs) {
+    fuzzified[v.name] = Object.fromEntries(Object.entries(v.sets).map(([k, s]) => [k, mf(s, inputs[v.name])]));
+  }
+  const fired = system.rules.map((r, i) => ({
+    i, rule: r, z: system.output.sugeno[r.then],
+    strength: Math.min(...Object.entries(r.if).map(([v, set]) => fuzzified[v][set])),
+  }));
+  const den = fired.reduce((a, f) => a + f.strength, 0);
+  const num = fired.reduce((a, f) => a + f.strength * f.z, 0);
+  const [lo, hi] = system.output.range;
+  return { fuzzified, fired, crisp: den > 0 ? num / den : (lo + hi) / 2 };
+}
+
 // ---------- vital-sign monitoring ----------
 const L = ['low', 'normal', 'elevated', 'veryHigh'];
 const T = ['low', 'normal', 'fever', 'high'];
@@ -58,7 +75,8 @@ export const VITALS_SYSTEM = {
       low: trap(34, 34, 35, 36.2), normal: trap(35.8, 36.4, 37.2, 37.8), fever: tri(37.4, 38.3, 39.2), high: trap(38.8, 39.8, 42, 42) } },
   ],
   output: { name: 'priority', label: 'Monitoring priority', unit: '/100', range: [0, 100], sets: {
-    routine: trap(0, 0, 15, 30), watch: tri(20, 38, 55), urgent: tri(45, 62, 80), critical: trap(70, 85, 100, 100) } },
+    routine: trap(0, 0, 15, 30), watch: tri(20, 38, 55), urgent: tri(45, 62, 80), critical: trap(70, 85, 100, 100) },
+    sugeno: { routine: 8, watch: 38, urgent: 62, critical: 88 } },
   rules: L.flatMap((h, i) => T.map((t, j) => ({ if: { heartRate: h, temp: t }, then: MATRIX[i][j] }))),
 };
 
@@ -79,7 +97,8 @@ export const ROOM_SYSTEM = {
       rest: trap(0, 0, 2, 4), care: tri(3, 5, 7), procedure: trap(6, 8, 10, 10) } },
   ],
   output: { name: 'intensity', label: 'Lighting intensity', unit: '%', range: [0, 100], sets: {
-    off: trap(0, 0, 5, 15), low: tri(10, 25, 40), medium: tri(30, 50, 70), high: tri(60, 75, 90), max: trap(80, 92, 100, 100) } },
+    off: trap(0, 0, 5, 15), low: tri(10, 25, 40), medium: tri(30, 50, 70), high: tri(60, 75, 90), max: trap(80, 92, 100, 100) },
+    sugeno: { off: 3, low: 25, medium: 50, high: 75, max: 94 } },
   rules: AMB.flatMap((a) => OCC.flatMap((o) => ACT.map((c) => {
     let lvl;
     if (o === 'empty') lvl = c === 'procedure' ? 1 : 0;

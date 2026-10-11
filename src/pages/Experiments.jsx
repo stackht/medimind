@@ -9,7 +9,6 @@ import { EXPERIMENTS } from '../experiments.jsx';
 import { SCENARIOS } from '../lib/patients.js';
 import { PRIORITY_LABEL } from '../lib/simData.js';
 
-const PROLOG_LEVEL = { routine: 'low', moderate: 'medium', high: 'high', emergency: 'high' };
 const FIELDS = ['age', 'sex', 'symptoms', 'pain', 'temp', 'heartRate', 'sys', 'bmi', 'glucose', 'condition', 'diag'];
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -44,7 +43,6 @@ export function ExperimentPage() {
   const { patient, update, load } = usePatient();
   const toast = useToast();
   const [key, setKey] = useState(0);
-  const [imported, setImported] = useState(false);
   if (!exp) return <div className="empty"><b>Experiment not found</b><Link to="/experiments">Back to experiments</Link></div>;
 
   const idx = EXPERIMENTS.filter((e) => !e.extra).findIndex((e) => e.slug === slug);
@@ -61,14 +59,6 @@ export function ExperimentPage() {
     } else { load(v.slice(7)); toast('Loaded preset scenario', 'info'); }
     setKey((k) => k + 1);
   };
-  const fromSim = imported ? {
-    resources: {
-      beds: snap.resources.beds.map(({ id, type, free }) => ({ id, type, free })),
-      doctors: snap.resources.doctors.map(({ id, specialty, free }) => ({ id, specialty, free })),
-      diags: snap.resources.diags.map(({ id, type, free }) => ({ id, type, free })),
-    },
-    queue: d.waiting.slice(0, 5).map((p) => ({ id: p.id, name: p.id, priority: PROLOG_LEVEL[p.priority], condition: p.condition, diag: p.diag })),
-  } : null;
   const current = SCENARIOS.find((s) => s.name === patient.name)?.key;
   const selValue = snap.patients.some((p) => p.id === patient.name) ? `sim:${patient.name}` : current ? `preset:${current}` : '';
 
@@ -95,12 +85,11 @@ export function ExperimentPage() {
               </select>
             </label>
           )}
-          {exp.fromSim && <button className="btn" onClick={() => { setImported(true); setKey((k) => k + 1); toast('Imported the live queue and resources', 'info'); }}><Icon name="download" size={15} />Import live queue and resources</button>}
-          <button className="btn" onClick={() => { setImported(false); if (exp.patient) load('chest'); setKey((k) => k + 1); toast('Experiment reset to defaults', 'info'); }}><Icon name="reset" size={15} />Reset experiment</button>
+          <button className="btn" onClick={() => { if (exp.patient) load('chest'); setKey((k) => k + 1); toast('Experiment reset to defaults', 'info'); }}><Icon name="reset" size={15} />Reset experiment</button>
           <span className="note" style={{ marginLeft: 'auto' }}>Results recompute live as inputs change. Use the controls inside for Play and Train.</span>
         </div>
       </div>
-      <div className="exp-body">{cloneElement(exp.el, { key, fromSim })}</div>
+      <div className="exp-body">{cloneElement(exp.el, { key })}</div>
       <div className="row spread" style={{ marginTop: 20 }}>
         {prev ? <Link to={`/experiments/${prev.slug}`} className="btn"><Icon name="chevleft" size={15} />{prev.short}</Link> : <span />}
         {next ? <Link to={`/experiments/${next.slug}`} className="btn">{next.short}<Icon name="chevron" size={15} /></Link> : <span />}

@@ -237,7 +237,7 @@ export default function App() {
         <div className="overlay" onClick={() => setAbout(false)}>
           <div className="modal" role="dialog" aria-modal="true" aria-label="About MediMind" onClick={(e) => e.stopPropagation()}>
             <h3>About MediMind</h3>
-            <p>An educational, frontend-only simulation of a hospital operations dashboard. Every patient is synthetic, the simulation is seeded and reproducible, and nothing is connected to a real hospital. The AI methods (Prolog, A*, fuzzy logic, neuro-fuzzy, Minimax, perceptron, competitive learning, n-gram models) are implemented in this project.</p>
+            <p>An educational, frontend-only simulation of a hospital operations dashboard. Every patient is synthetic, the simulation is seeded and reproducible, and nothing is connected to a real hospital. The AI methods (PEAS problem formulation, Prolog, BFS, DFS, A*, Minimax, fuzzy logic, Mamdani and Sugeno inference, neuro-fuzzy, perceptron, competitive learning, n-gram models) are implemented in this project.</p>
             <div className="row" style={{ justifyContent: 'flex-end', marginTop: 16 }}><button className="btn primary" onClick={() => setAbout(false)} autoFocus>Close</button></div>
           </div>
         </div>

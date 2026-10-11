@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import { infer, ROOM_SYSTEM } from '../lib/fuzzy.js';
-import { Card, Explain, PageHeader, Slider, Stat } from '../components/ui.jsx';
-import { MembershipChart } from '../components/charts.jsx';
+import { infer, inferSugeno, ROOM_SYSTEM } from '../lib/fuzzy.js';
+import { Card, Explain, PageHeader, Seg, Slider, Stat } from '../components/ui.jsx';
+import { LineChart, MembershipChart } from '../components/charts.jsx';
 
 const PRESETS = [
   { name: 'Night rest', ambient: 15, occupancy: 1, activity: 1 },
@@ -10,6 +10,13 @@ const PRESETS = [
   { name: 'Procedure at night', ambient: 30, occupancy: 5, activity: 9 },
   { name: 'Empty room', ambient: 200, occupancy: 0, activity: 0 },
 ];
+const SWEEPS = {
+  ambient: { label: 'Ambient light', unit: 'lux', min: 0, max: 1000 },
+  occupancy: { label: 'Room occupancy', unit: 'people', min: 0, max: 6 },
+  activity: { label: 'Activity level', unit: '/10', min: 0, max: 10 },
+};
+
+const peak = (s) => (s.type === 'tri' ? s.p[1] : (s.p[1] + s.p[2]) / 2);
 
 function RoomScene({ intensity, ambient, occupancy }) {
   const people = Math.round(occupancy);
@@ -45,16 +52,37 @@ function RoomScene({ intensity, ambient, occupancy }) {
 
 export default function Room() {
   const [v, setV] = useState(PRESETS[1]);
-  const out = useMemo(() => infer(ROOM_SYSTEM, { ambient: v.ambient, occupancy: v.occupancy, activity: v.activity }), [v]);
+  const [method, setMethod] = useState('mamdani');
+  const [sweepKey, setSweepKey] = useState('ambient');
+  const inputs = { ambient: v.ambient, occupancy: v.occupancy, activity: v.activity };
+  const mam = useMemo(() => infer(ROOM_SYSTEM, inputs), [v]); // eslint-disable-line react-hooks/exhaustive-deps
+  const sug = useMemo(() => inferSugeno(ROOM_SYSTEM, inputs), [v]); // eslint-disable-line react-hooks/exhaustive-deps
   const [amb, occ, act] = ROOM_SYSTEM.inputs;
-  const active = out.fired.filter((f) => f.strength > 0.001).sort((a, b) => b.strength - a.strength);
+  const active = mam.fired.filter((f) => f.strength > 0.001).sort((a, b) => b.strength - a.strength);
   const set = (k) => (x) => setV({ ...v, [k]: x });
+  const shown = method === 'mamdani' ? mam.crisp : sug.crisp;
+
+  // sweep one input while the other two stay fixed, and compare the two inference methods
+  const sweep = useMemo(() => {
+    const s = SWEEPS[sweepKey]; const n = 41; const m = [], g = [];
+    for (let i = 0; i < n; i++) {
+      const x = s.min + ((s.max - s.min) * i) / (n - 1);
+      const inp = { ...inputs, [sweepKey]: x };
+      m.push(infer(ROOM_SYSTEM, inp, 101).crisp); g.push(inferSugeno(ROOM_SYSTEM, inp).crisp);
+    }
+    const diffs = m.map((a, i) => Math.abs(a - g[i]));
+    return { m, g, mad: diffs.reduce((a, b) => a + b, 0) / n, max: Math.max(...diffs) };
+  }, [v, sweepKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const table = useMemo(() => PRESETS.map((p) => {
+    const i = { ambient: p.ambient, occupancy: p.occupancy, activity: p.activity };
+    return { ...p, m: infer(ROOM_SYSTEM, i).crisp, s: inferSugeno(ROOM_SYSTEM, i).crisp };
+  }), []);
 
   return (
     <div className="stack">
-      <PageHeader title="Smart Room Lighting with Fuzzy Logic"
-        desc="A fuzzy controller sets room lighting from three imprecise inputs: how bright it already is, how many people are present, and how demanding the activity is. The output blends smoothly instead of switching between a few fixed levels."
-        tags={['Fuzzy control', 'Membership functions', '27 rules', 'Centroid defuzzification']} />
+      <PageHeader title="Smart Room Lighting with Mamdani and Sugeno FIS"
+        desc="Two fuzzy inference systems control room lighting from the same three imprecise inputs and the same 27 rules. Mamdani clips fuzzy output sets and takes their centroid; Sugeno gives each rule a crisp constant and takes a weighted average. Compare their outputs."
+        tags={['Mamdani FIS', 'Sugeno FIS', 'Rule-based control', '27 rules']} />
 
       <div className="grid g-side">
         <div className="stack">
@@ -66,13 +94,14 @@ export default function Room() {
             <Slider label="Room occupancy" unit="people" min={0} max={6} step={0.5} value={v.occupancy} onChange={set('occupancy')} />
             <Slider label="Activity level" unit="/10" min={0} max={10} step={0.5} value={v.activity} onChange={set('activity')} />
           </Card>
-          <div className="grid g2">
-            <Stat k="Lighting intensity" v={`${out.crisp.toFixed(0)}%`} s={`mostly “${out.label}”`} />
-            <Stat k="Rules active" v={active.length} s="of 27" />
+          <div className="grid g3" style={{ gap: 10 }}>
+            <Stat k="Mamdani" v={`${mam.crisp.toFixed(1)}%`} s={`mostly “${mam.label}”`} />
+            <Stat k="Sugeno" v={`${sug.crisp.toFixed(1)}%`} s="weighted average" />
+            <Stat k="Difference" v={`${Math.abs(mam.crisp - sug.crisp).toFixed(1)}`} s="percentage points" />
           </div>
         </div>
-        <Card title="Room preview" sub="Brightness follows the controller output.">
-          <RoomScene intensity={out.crisp} ambient={v.ambient} occupancy={v.occupancy} />
+        <Card title="Room preview" sub="Brightness follows the selected controller." right={<Seg value={method} onChange={setMethod} options={[['mamdani', 'Mamdani'], ['sugeno', 'Sugeno']]} />}>
+          <RoomScene intensity={shown} ambient={v.ambient} occupancy={v.occupancy} />
         </Card>
       </div>
 
@@ -83,8 +112,33 @@ export default function Room() {
       </div>
 
       <div className="grid g2">
-        <Card title="Aggregated output" sub="Clipped rule consequents merged; the red line is the centroid.">
-          <MembershipChart variable={ROOM_SYSTEM.output} curve={out.curve} crisp={out.crisp} height={170} />
+        <Card title="Mamdani: aggregated output" sub="Clipped rule consequents merged; the red line is the centroid.">
+          <MembershipChart variable={ROOM_SYSTEM.output} curve={mam.curve} crisp={mam.crisp} height={170} />
+        </Card>
+        <Card title="Sugeno: rule constants" sub="Each rule outputs a constant; the result is sum(w·z) / sum(w).">
+          <table className="tbl"><thead><tr><th>Output label</th><th>Constant z</th><th>Mamdani set peak</th></tr></thead><tbody>
+            {Object.entries(ROOM_SYSTEM.output.sugeno).map(([k, z]) => <tr key={k}><td style={{ textTransform: 'capitalize' }}>{k}</td><td className="mono">{z}</td><td className="mono">{peak(ROOM_SYSTEM.output.sets[k])}</td></tr>)}
+          </tbody></table>
+          <div className="note" style={{ marginTop: 8 }}>Sugeno result: Σ(w·z) = {sug.fired.reduce((a, f) => a + f.strength * f.z, 0).toFixed(2)}, Σw = {sug.fired.reduce((a, f) => a + f.strength, 0).toFixed(2)} → {sug.crisp.toFixed(1)}%</div>
+        </Card>
+      </div>
+
+      <Card title="Comparing the two systems" sub="Vary one input while the other two stay at their current values."
+        right={<Seg value={sweepKey} onChange={setSweepKey} options={Object.entries(SWEEPS).map(([k, s]) => [k, s.label])} />}>
+        <LineChart series={[{ name: 'Mamdani (centroid)', data: sweep.m, color: '#0b7f8f' }, { name: 'Sugeno (weighted average)', data: sweep.g, color: '#e0841b' }]}
+          yLabel="lighting %" xLabel={`${SWEEPS[sweepKey].label}: ${SWEEPS[sweepKey].min} to ${SWEEPS[sweepKey].max} ${SWEEPS[sweepKey].unit}`} height={190} />
+        <div className="grid g3" style={{ gap: 10, marginTop: 10 }}>
+          <Stat k="Mean absolute difference" v={sweep.mad.toFixed(1)} s="points over the sweep" />
+          <Stat k="Largest difference" v={sweep.max.toFixed(1)} s="points" />
+          <Stat k="Rules firing now" v={active.length} s="of 27" />
+        </div>
+      </Card>
+
+      <div className="grid g2">
+        <Card title="Preset scenarios">
+          <table className="tbl"><thead><tr><th>Scenario</th><th>Mamdani</th><th>Sugeno</th><th>Difference</th></tr></thead><tbody>
+            {table.map((r) => <tr key={r.name}><td>{r.name}</td><td className="mono">{r.m.toFixed(1)}%</td><td className="mono">{r.s.toFixed(1)}%</td><td className="mono">{Math.abs(r.m - r.s).toFixed(1)}</td></tr>)}
+          </tbody></table>
         </Card>
         <Card title="Rules firing now">
           <div className="scroll" style={{ maxHeight: 230 }}><table className="tbl"><tbody>
@@ -97,7 +151,7 @@ export default function Room() {
           </tbody></table></div>
         </Card>
       </div>
-      <Explain>Rule logic: busier activities need more light, a dark room needs more and a bright room less, a crowded room adds a step, and an empty room dims to “off” (or a low prep light before a procedure).</Explain>
+      <Explain title="Mamdani vs Sugeno">Both use the same fuzzification and the same rules. Mamdani keeps linguistic output sets, so its result needs aggregation and centroid defuzzification (more computation, smoother and easier to read). Sugeno replaces each output set with a constant, so the result is a simple weighted average (cheaper, easy to tune or learn, which is why ANFIS is built on it). Here they agree closely, with the largest gaps at the ends where Mamdani’s output sets cannot reach the extremes of the scale.</Explain>
     </div>
   );
 }

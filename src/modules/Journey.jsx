@@ -37,7 +37,7 @@ export default function Journey() {
       out: <><Badge level={result.vitals.label} /> Monitoring priority <b>{result.vitals.crisp.toFixed(0)}/100</b> from HR {patient.heartRate} bpm and {patient.temp}°C</> },
     { n: 3, ps: 'Neuro-fuzzy', t: 'Risk estimation', to: '/experiments/risk',
       out: <><Badge level={result.risk.category} /> Illustrative risk score <b>{result.risk.score}/100</b></> },
-    { n: 4, ps: 'Prolog', t: 'Resource allocation', to: '/experiments/resource-management',
+    { n: 4, ps: 'Prolog', t: 'Resource allocation', to: '/resources',
       out: <>Bed <b>{label(result.alloc.bed)}</b> · doctor <b>{label(result.alloc.doctor)}</b> · diagnostics <b>{label(result.alloc.diag)}</b></> },
     { n: 5, ps: result.route.algo === 'A*' ? 'A*' : 'BFS', t: `Route to ${NODE_BY_ID[result.dest].name}`, to: result.route.algo === 'A*' ? '/experiments/emergency-routing' : '/experiments/navigation',
       out: <>{result.route.path.map((p) => NODE_BY_ID[p].name).join(' → ')} <span className="muted">({result.route.cost} m, {result.route.algo})</span></> },

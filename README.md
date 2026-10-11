@@ -27,8 +27,21 @@ Simulation controls: start, pause, reset, speed (1x to 8x), add patient, trigger
 ## AI Experiments
 
 The ten problem statements, each a self-contained experiment that can load a patient from the live simulation:
-navigation (BFS/DFS), Prolog triage, Prolog resource management, A* routing, Minimax security, fuzzy monitoring,
-fuzzy room control, neuro-fuzzy risk, perceptron and competitive learning, bigram/trigram text generation.
+
+| # | Experiment | Technique |
+|---|------------|-----------|
+| 1 | AI-Based Patient Triage and Monitoring System | Problem formulation and the PEAS model |
+| 2 | Patient Priority Classification | Prolog facts and rules |
+| 3 | Patient Navigation | BFS, DFS, state-space search |
+| 4 | Emergency Patient Route Optimization | A* search |
+| 5 | Healthcare Resource Security | Minimax with alpha-beta pruning |
+| 6 | Intelligent Patient Monitoring | Fuzzy logic controller |
+| 7 | Smart Hospital Room Environment Control | Mamdani and Sugeno FIS, compared |
+| 8 | Hybrid Neuro-Fuzzy Risk Estimation | ANFIS (neural learning and fuzzy inference) |
+| 9 | Patient Classification and Pattern Discovery | Perceptron and competitive learning |
+| 10 | Healthcare Text Prediction and Generation | Bigram micro LM and trigram SLM |
+
+The live dashboard additionally allocates beds, doctors and diagnostics with a Prolog knowledge base (a supporting rule base, not one of the ten experiments).
 
 ## Run
 
